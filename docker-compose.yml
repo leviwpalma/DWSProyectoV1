@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: uniondental_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: uniondental
+      DB_USER: uniondental_user
+      DB_PASS: uniondental_pass
+
+  db:
+    image: mysql:8.0
+    container_name: uniondental_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: uniondental
+      MYSQL_USER: uniondental_user
+      MYSQL_PASSWORD: uniondental_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: uniondental_pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpass
+    depends_on:
+      - db
+
+volumes:
+  db_data:
