@@ -1,0 +1,60 @@
+services:
+  clinica_app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: clinica_backend
+    restart: unless-stopped
+    ports:
+      - "8095:80"                  # Acceso web en http://localhost:8095
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      - DB_HOST=clinica_db
+      - DB_PORT=3306
+      - DB_NAME=clinica_dental_db
+      - DB_USER=clinica_user
+      - DB_PASS=Clinica2026!Pass
+    depends_on:
+      - clinica_db
+    networks:
+      - clinica_net
+
+  clinica_db:
+    image: mysql:8.0
+    container_name: clinica_database
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: clinica_dental_db
+      MYSQL_USER: clinica_user
+      MYSQL_PASSWORD: Clinica2026!Pass
+      MYSQL_ROOT_PASSWORD: Root2026!Pass
+    ports:
+      - "3308:3306"                # Puerto 3308 en tu máquina para no chocar con el 3306 ni 3307
+    volumes:
+      - clinica_db_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    networks:
+      - clinica_net
+
+  clinica_pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: clinica_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8090:80"                 # Gestor web de BD en http://localhost:8090
+    environment:
+      PMA_HOST: clinica_db
+      PMA_PORT: 3306
+    depends_on:
+      - clinica_db
+    networks:
+      - clinica_net
+
+volumes:
+  clinica_db_data:
+
+networks:
+  clinica_net:
+    driver: bridge
