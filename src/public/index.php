@@ -7,15 +7,24 @@ error_reporting(E_ALL);
 
 define('BASE_PATH', dirname(__DIR__));
 
-spl_autoload_register(function ($class){
-    $class = str_replace('App\\', '', $class);
-    $parts = explode('\\', $class);
-    $parts[0] = strtolower($parts[0]);
+spl_autoload_register(function ($class) {
+    $mapa = [
+        'App\\'    => 'app/',
+        'Config\\' => 'config/',
+    ];
 
-    $rute = BASE_PATH . '/app/' . implode('/', $parts) . '.php';
+    foreach ($mapa as $prefijo => $carpeta) {
+        if (str_starts_with($class, $prefijo)) {
+            $resto = substr($class, strlen($prefijo));
+            $partes = explode('\\', $resto);
+            $partes[0] = strtolower($partes[0]);
 
-    if (file_exists($rute)) {
-        require $rute;
+            $ruta = BASE_PATH . '/' . $carpeta . implode('/', $partes) . '.php';
+            if (file_exists($ruta)) {
+                require $ruta;
+            }
+            return;
+        }
     }
 });
 

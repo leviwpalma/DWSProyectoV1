@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Core\Database;
+use Config\Database;
 use App\Models\Paciente;
 
 class PacientesController
@@ -32,7 +32,7 @@ class PacientesController
     //
     public function create(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $datos = $this->validaciones($_POST);
             $this->model->crear($datos);
             header('Location: /pacientes');
@@ -102,16 +102,32 @@ class PacientesController
         if (empty(trim($datos['apellidos'] ?? ''))) {
             $errores[] = 'El apellido es obligatorio.';
         }
-        if (empty(trim($datos['telefono'] ?? ''))) {
-            $errores[] = 'El teléfono es obligatorio.';
+        if (empty(trim($datos['documento_identidad'] ?? ''))) {
+            $errores[] = 'El documento de identidad es obligatorio.';
+        } elseif (!preg_match('/^\d{9}$/', trim($datos['documento_identidad']))) {
+            $errores[] = 'El documento de identidad debe tener exactamente 9 dígitos.';
         }
         if (empty($datos['fecha_nacimiento'] ?? '')) {
             $errores[] = 'La fecha de nacimiento es obligatoria.';
         } elseif (strtotime($datos['fecha_nacimiento']) >= strtotime('today')) {
             $errores[] = 'La fecha de nacimiento debe ser anterior a hoy.';
         }
-        if (!empty($datos['correo']) && !filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
+        if (empty($datos['genero'] ?? '')) {
+            $errores[] = 'El género es obligatorio.';
+        }
+        if (empty(trim($datos['telefono'] ?? ''))) {
+            $errores[] = 'El teléfono es obligatorio.';
+        }
+        if (empty(trim($datos['email'] ?? ''))) {
+            $errores[] = 'El correo es obligatorio.';
+        } elseif (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
             $errores[] = 'El correo no tiene formato válido.';
+        }
+        if (empty(trim($datos['direccion'] ?? ''))) {
+            $errores[] = 'La dirección es obligatoria.';
+        }
+        if (empty(trim($datos['antecedentes_medicos'] ?? ''))) {
+            $errores[] = 'Los antecedentes médicos son obligatorios.';
         }
 
         if (!empty($errores)) {
@@ -124,9 +140,13 @@ class PacientesController
         return [
             'nombres'               => trim($datos['nombres']),
             'apellidos'             => trim($datos['apellidos']),
-            'telefono'              => trim($datos['telefono']),
-            'correo'                => !empty($datos['correo']) ? trim($datos['correo']) : null,
+            'documento_identidad'   => trim($datos['documento_identidad']),
             'fecha_nacimiento'      => $datos['fecha_nacimiento'],
+            'genero'                => $datos['genero'],
+            'telefono'              => trim($datos['telefono']),
+            'email'                 => trim($datos['email']),
+            'direccion'             => trim($datos['direccion']),
+            'antecedentes_medicos'  => trim($datos['antecedentes_medicos']),
         ];
     }
 

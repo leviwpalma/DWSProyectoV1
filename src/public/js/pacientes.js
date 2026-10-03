@@ -23,21 +23,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderFilas(pacientes) {
         if (!pacientes.length) {
-            tbody.innerHTML = `<tr><td>No se encuentran pacientes.</td></tr>`;
+            tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-muted py-5">
+                    <div class="fs-5 mb-1">📋</div>
+                    No se encuentran pacientes registrados.
+                </td>
+            </tr>`;
             return;
         }
         tbody.innerHTML = pacientes.map(p => `
         <tr>
-            <td>${p.codigo_expediente}</td>
+            <td><span class="badge bg-primary-subtle text-primary-emphasis">${p.codigo_expediente}</span></td>
             <td>${p.nombres}</td>
             <td>${p.apellidos}</td>
+            <td>${p.documento_identidad ?? '—'}</td>
             <td>${p.telefono}</td>
-            <td>${p.correo ?? ''}</td>
-            <td>
-                <a href="/pacientes/${p.id_paciente}">Ver</a>
-                <a href="/pacientes/${p.id_paciente}/edit">Editar</a>
-                <form method="POST" action="/pacientes/${p.id_paciente}/delete" onsubmit="return confirm('¿Desactivar?')">
-                    <button>Eliminar</button>
+            <td>${p.email ?? '—'}</td>
+            <td class="text-end">
+                <a href="/pacientes/${p.id_paciente}" class="btn btn-sm btn-outline-info">Ver</a>
+                <a href="/pacientes/${p.id_paciente}/edit" class="btn btn-sm btn-outline-warning">Editar</a>
+                <form method="POST" action="/pacientes/${p.id_paciente}/delete"
+                      onsubmit="return confirm('¿Desactivar?')" class="d-inline">
+                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
                 </form>
             </td>
         </tr>
