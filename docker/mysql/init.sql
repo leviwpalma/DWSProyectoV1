@@ -125,3 +125,17 @@ INSERT IGNORE INTO roles (id_rol, nombre, descripcion) VALUES
 -- Password temporal: Admin1234! (Generado con password_hash de PHP BCRYPT)
 INSERT IGNORE INTO usuarios (id_usuario, id_rol, nombre, apellido, email, password_hash, estado) VALUES
 (1, 1, 'Admin', 'Sistema', 'admin@clinicadental.local', '$2y$10$wZk0N1WvGz6kYQ8Q1Jk9ne0sZzR6q4l6iGvN0fVlYl6OQy1x4fC7K', 'activo');
+
+-- Categorías iniciales de servicios
+INSERT IGNORE INTO categorias_servicio
+(id_categoria, nombre, descripcion, estado) VALUES
+(1, 'Atención General', 'Servicios odontológicos de atención general', 'activo'),
+(2, 'Atención Especializada', 'Servicios odontológicos especializados', 'activo');
+
+-- Servicios iniciales de prueba
+INSERT IGNORE INTO servicios
+(id_servicio, id_categoria, nombre, descripcion, duracion_minutos, precio_ref, estado) VALUES
+(1, 1, 'Consulta General', 'Evaluación odontológica general', 30, 25.00, 'activo'),
+(2, 1, 'Limpieza Dental', 'Limpieza preventiva y remoción de placa', 45, 40.00, 'activo'),
+(3, 2, 'Endodoncia', 'Tratamiento de conducto', 90, 150.00, 'activo');
+
