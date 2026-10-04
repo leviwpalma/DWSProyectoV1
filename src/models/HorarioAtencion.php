@@ -62,18 +62,24 @@ class HorarioAtencion {
     /**
      * Obtener bloques de atención de un médico en un día específico (Usado para Fetch API)
      */
-    public function obtenerBloquesPorDia(int $idMedico, string $diaSemana): array {
-        $sql = "SELECT hora_apertura, hora_cierre 
-                FROM horarios_atencion 
-                WHERE id_medico = :id_medico 
-                AND LOWER(dia_semana) = LOWER(:dia_semana)";
+    public function obtenerBloquesPorDia(int $idMedico, string $diaSemana): array
+{
+    $sql = "SELECT 
+                id_horario,
+                id_medico,
+                dia_semana,
+                hora_inicio AS hora_apertura,
+                hora_fin AS hora_cierre
+            FROM horarios_atencion
+            WHERE id_medico = :id_medico 
+              AND dia_semana = :dia_semana";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            ':id_medico' => $idMedico,
-            ':dia_semana' => $diaSemana
-        ]);
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':id_medico' => $idMedico,
+        ':dia_semana' => $diaSemana
+    ]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
 }

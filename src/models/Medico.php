@@ -1,52 +1,60 @@
 <?php
+
 namespace Models;
 
 use PDO;
 
-class Medico {
+class Medico
+{
     private $db;
 
-    public function __construct(PDO $db) {
+    public function __construct(PDO $db)
+    {
         $this->db = $db;
     }
 
     /**
-     * Obtener la lista de todos los médicos registrados y activos
+     * Obtener todos los médicos registrados
      */
-    public function obtenerTodos(): array {
-        $sql = "SELECT m.id, m.id_usuario, u.nombre, u.apellido, u.email, m.especialidad, m.estado 
+    public function obtenerTodos(): array
+    {
+        $sql = "SELECT 
+                    m.id_medico,
+                    m.id_usuario,
+                    m.especialidad,
+                    m.telefono,
+                    m.estado,
+                    COALESCE(CONCAT(u.nombre, ' ', u.apellido), 'Sin usuario asignado') AS nombre_completo
                 FROM medicos m
-                INNER JOIN usuarios u ON m.id_usuario = u.id
-                ORDER BY u.apellido ASC";
+                LEFT JOIN usuarios u ON m.id_usuario = u.id_usuario";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Registrar un nuevo médico asociado a un id_usuario existente
+     * Obtener un médico por su ID
      */
-    public function crear(int $idUsuario, string $especialidad): bool {
-        $sql = "INSERT INTO medicos (id_usuario, especialidad, estado) 
-                VALUES (:id_usuario, :especialidad, 'Activo')";
+    public function obtenerPorId(int $idMedico): ?array
+    {
+        $sql = "SELECT 
+                    m.id_medico,
+                    m.id_usuario,
+                    m.especialidad,
+                    m.telefono,
+                    m.estado,
+                    COALESCE(CONCAT(u.nombre, ' ', u.apellido), 'Sin usuario asignado') AS nombre_completo
+                FROM medicos m
+                LEFT JOIN usuarios u ON m.id_usuario = u.id_usuario
+                WHERE m.id_medico = :id_medico";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':id_usuario'   => $idUsuario,
-            ':especialidad' => $especialidad
-        ]);
-    }
+        $stmt->execute([':id_medico' => $idMedico]);
 
-    /**
-     * Desactivar o reactivar a un médico
-     */
-    public function cambiarEstado(int $idMedico, string $nuevoEstado): bool {
-        $sql = "UPDATE medicos SET estado = :estado WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':estado' => $nuevoEstado,
-            ':id'     => $idMedico
-        ]);
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
     }
 }
