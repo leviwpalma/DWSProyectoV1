@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!pacientes.length) {
             tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-muted py-5">
-                    <div class="fs-5 mb-1">📋</div>
+                <td colspan="8" class="text-center text-muted py-5">
+                    <i class="bi bi-inbox d-block mb-2" style="font-size: 1.5rem;"></i>
                     No se encuentran pacientes registrados.
                 </td>
             </tr>`;
@@ -34,19 +34,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         tbody.innerHTML = pacientes.map(p => `
         <tr>
-            <td><span class="badge bg-primary-subtle text-primary-emphasis">${p.codigo_expediente}</span></td>
             <td>${p.nombres}</td>
             <td>${p.apellidos}</td>
+            <td>${p.codigo_expediente}</td>
             <td>${p.documento_identidad ?? '—'}</td>
+            <td>${p.fecha_nacimiento ?? '—'}</td>
             <td>${p.telefono}</td>
             <td>${p.email ?? '—'}</td>
             <td class="text-end">
-                <a href="/pacientes/${p.id_paciente}" class="btn btn-sm btn-outline-info">Ver</a>
-                <a href="/pacientes/${p.id_paciente}/edit" class="btn btn-sm btn-outline-warning">Editar</a>
-                <form method="POST" action="/pacientes/${p.id_paciente}/delete"
-                      onsubmit="return confirm('¿Desactivar?')" class="d-inline">
-                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
-                </form>
+                <a href="/pacientes/${p.id_paciente}/edit"
+                   class="text-warning me-2"
+                   title="Editar">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="/pacientes/${p.id_paciente}/delete"
+                   class="text-danger"
+                   title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                </a>
             </td>
         </tr>
     `).join('');

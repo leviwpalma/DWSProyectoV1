@@ -64,6 +64,20 @@ class PacientesController
     }
 
     //
+    public function eliminar(int $id): void
+    {
+        $paciente = $this->model->findById($id);
+
+        if (!$paciente) {
+            http_response_code(404);
+            exit('Paciente no existe');
+        }
+
+        $eliminando = true;
+        require __DIR__ . '/../views/pacientes/form.php';
+    }
+
+    //
     public function show(int $id): void
     {
         $paciente = $this->model->findById($id);

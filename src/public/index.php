@@ -40,6 +40,7 @@ $rutamiento->get('/pacientes/{id}',         [PacientesController::class, 'show']
 $rutamiento->get('/pacientes/{id}/edit',    [PacientesController::class, 'edit']);
 $rutamiento->post('/pacientes/{id}/edit',   [PacientesController::class, 'edit']);
 $rutamiento->post('/pacientes/{id}/delete', [PacientesController::class, 'desactivar']);
+$rutamiento->get('/pacientes/{id}/delete', [PacientesController::class, 'eliminar']);
 
 $rutamiento->get('/api/pacientes',          [PacientesController::class, 'search']);
 
