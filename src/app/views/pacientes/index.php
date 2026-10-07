@@ -64,6 +64,13 @@ require __DIR__ . '/../layout.php'; ?>
                                 <td><?= htmlspecialchars($p['telefono']) ?></td>
                                 <td><?= htmlspecialchars($p['email'] ?? '—') ?></td>
                                 <td class="text-end">
+                                    <a href="#"
+                                        class="text-info me-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#expediente-<?= $p['id_paciente'] ?>"
+                                        title="Ver expediente">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
                                     <a href="/pacientes/<?= $p['id_paciente'] ?>/edit"
                                         class="text-warning me-2"
                                         title="Editar">
@@ -76,13 +83,90 @@ require __DIR__ . '/../layout.php'; ?>
                                     </a>
                                 </td>
                             </tr>
+
+                            <!-- Modal del paciente -->
+                            <div class="modal fade expediente-modal" id="expediente-<?= $p['id_paciente'] ?>" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="expediente-card">
+                                                <div class="expediente-side">
+                                                    <div>
+                                                        <div class="exp-label">
+                                                            Expediente No.<br><?= htmlspecialchars($p['codigo_expediente']) ?>
+                                                        </div>
+                                                        <div class="exp-avatar">
+                                                            <i class="bi bi-person"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="exp-dots">• • •</div>
+                                                </div>
+
+                                                <div class="expediente-main">
+                                                    <h4><?= htmlspecialchars($p['nombres'] . ' ' . $p['apellidos']) ?></h4>
+
+                                                    <div class="expediente-grid">
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-gender-ambiguous"></i>
+                                                            <span>
+                                                                <?php
+                                                                $generos = ['M' => 'Masculino', 'F' => 'Femenino', 'Otro' => 'Otro'];
+                                                                echo htmlspecialchars($generos[$p['genero'] ?? ''] ?? 'n/d');
+                                                                ?>
+                                                            </span>
+                                                        </div>
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-geo-alt"></i>
+                                                            <span><?= htmlspecialchars($p['direccion'] ?? 'Sin dirección') ?></span>
+                                                        </div>
+
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-calendar"></i>
+                                                            <span>
+                                                                <?php
+                                                                if (!empty($p['fecha_nacimiento'])) {
+                                                                    $meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+                                                                    [$y, $m, $d] = explode('-', $p['fecha_nacimiento']);
+                                                                    echo htmlspecialchars("$d-" . $meses[(int)$m - 1] . "-$y");
+                                                                } else {
+                                                                    echo 'n/d';
+                                                                }
+                                                                ?>
+                                                            </span>
+                                                        </div>
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-telephone"></i>
+                                                            <span><?= htmlspecialchars($p['telefono']) ?></span>
+                                                        </div>
+
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-card-text"></i>
+                                                            <span><?= htmlspecialchars($p['documento_identidad'] ?? 'n/d') ?></span>
+                                                        </div>
+                                                        <div class="expediente-item">
+                                                            <i class="bi bi-envelope"></i>
+                                                            <span><?= htmlspecialchars($p['email'] ?? 'n/d') ?></span>
+                                                        </div>
+
+                                                        <div class="expediente-item" style="grid-column: 1 / -1;">
+                                                            <i class="bi bi-clipboard-pulse"></i>
+                                                            <span><?= htmlspecialchars($p['antecedentes_medicos'] ?? 'Sin antecedentes registrados') ?></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
-
 </div>
+
+
 
 <?php require __DIR__ . '/../layout-footer.php'; ?>

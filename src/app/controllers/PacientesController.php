@@ -33,13 +33,22 @@ class PacientesController
     public function create(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $datos = $this->validaciones($_POST);
-            $this->model->crear($datos);
+            $resultado = $this->validaciones($_POST);
+
+            if (!empty($resultado['errores'])) {
+                $paciente = $_POST;
+                $errores = $resultado['errores'];
+                require __DIR__ . '/../views/pacientes/form.php';
+                return;
+            }
+
+            $this->model->crear($resultado['datos']);
             header('Location: /pacientes');
             exit;
         }
 
         $paciente = null;
+        $errores = [];
         require __DIR__ . '/../views/pacientes/form.php';
     }
 
@@ -54,12 +63,22 @@ class PacientesController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $datos = $this->validaciones($_POST);
-            $this->model->actualizar($id, $datos);
+            $resultado = $this->validaciones($_POST);
+
+            if (!empty($resultado['errores'])) {
+                $paciente = $_POST;
+                $paciente['id_paciente'] = $id;
+                $errores = $resultado['errores'];
+                require __DIR__ . '/../views/pacientes/form.php';
+                return;
+            }
+
+            $this->model->actualizar($id, $resultado['datos']);
             header('Location: /pacientes');
             exit;
         }
 
+        $errores = [];
         require __DIR__ . '/../views/pacientes/form.php';
     }
 
@@ -110,57 +129,88 @@ class PacientesController
     {
         $errores = [];
 
-        if (empty(trim($datos['nombres'] ?? ''))) {
+        $nombres = trim($datos['nombres'] ?? '');
+        if ($nombres === '') {
             $errores[] = 'El nombre es obligatorio.';
-        }
-        if (empty(trim($datos['apellidos'] ?? ''))) {
-            $errores[] = 'El apellido es obligatorio.';
-        }
-        if (empty(trim($datos['documento_identidad'] ?? ''))) {
-            $errores[] = 'El documento de identidad es obligatorio.';
-        } elseif (!preg_match('/^\d{9}$/', trim($datos['documento_identidad']))) {
-            $errores[] = 'El documento de identidad debe tener exactamente 9 dígitos.';
-        }
-        if (empty($datos['fecha_nacimiento'] ?? '')) {
-            $errores[] = 'La fecha de nacimiento es obligatoria.';
-        } elseif (strtotime($datos['fecha_nacimiento']) >= strtotime('today')) {
-            $errores[] = 'La fecha de nacimiento debe ser anterior a hoy.';
-        }
-        if (empty($datos['genero'] ?? '')) {
-            $errores[] = 'El género es obligatorio.';
-        }
-        if (empty(trim($datos['telefono'] ?? ''))) {
-            $errores[] = 'El teléfono es obligatorio.';
-        }
-        if (empty(trim($datos['email'] ?? ''))) {
-            $errores[] = 'El correo es obligatorio.';
-        } elseif (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
-            $errores[] = 'El correo no tiene formato válido.';
-        }
-        if (empty(trim($datos['direccion'] ?? ''))) {
-            $errores[] = 'La dirección es obligatoria.';
-        }
-        if (empty(trim($datos['antecedentes_medicos'] ?? ''))) {
-            $errores[] = 'Los antecedentes médicos son obligatorios.';
+        } elseif (mb_strlen($nombres) < 3) {
+            $errores[] = 'El nombre debe tener al menos 3 caracteres.';
+        } elseif (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/u', $nombres)) {
+            $errores[] = 'El nombre solo puede contener letras y espacios.';
         }
 
+        $apellidos = trim($datos['apellidos'] ?? '');
+        if ($apellidos === '') {
+            $errores[] = 'El apellido es obligatorio.';
+        } elseif (mb_strlen($apellidos) < 3) {
+            $errores[] = 'El apellido debe tener al menos 3 caracteres.';
+        } elseif (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/u', $apellidos)) {
+            $errores[] = 'El apellido solo puede contener letras y espacios.';
+        }
+
+        $documento = strtoupper(trim($datos['documento_identidad'] ?? ''));
+        if ($documento === '') {
+            $errores[] = 'El documento de identidad o pasaporte es obligatorio.';
+        } elseif (!preg_match('/^(\d{9}|[A-Z]{1,3}\d{6,9})$/', $documento)) {
+            $errores[] = 'El documento no tiene un formato válido (DUI: 9 dígitos; Pasaporte: A1234567).';
+        }
+
+        $fecha = $datos['fecha_nacimiento'] ?? '';
+        if (empty($fecha)) {
+            $errores[] = 'La fecha de nacimiento es obligatoria.';
+        } else {
+            $timestamp = strtotime($fecha);
+            if ($timestamp === false) {
+                $errores[] = 'La fecha de nacimiento no es válida.';
+            } elseif ($timestamp >= strtotime('today')) {
+                $errores[] = 'La fecha de nacimiento debe ser anterior a hoy.';
+            } elseif ($timestamp < strtotime('-120 years')) {
+                $errores[] = 'La fecha de nacimiento no puede ser mayor a 120 años.';
+            }
+        }
+
+        $genero = $datos['genero'] ?? '';
+        if (!in_array($genero, ['M', 'F', 'Otro'], true)) {
+            $errores[] = 'El género es obligatorio.';
+        }
+
+        $telefono = trim($datos['telefono'] ?? '');
+        if ($telefono === '') {
+            $errores[] = 'El teléfono es obligatorio.';
+        } elseif (!preg_match('/^\d{4}-\d{4}$/', $telefono)) {
+            $errores[] = 'El teléfono debe tener el formato 0000-0000.';
+        }
+
+        $email = trim($datos['email'] ?? '');
+        if ($email === '') {
+            $errores[] = 'El correo es obligatorio.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errores[] = 'El correo no tiene un formato válido.';
+        }
+
+        $direccion = trim($datos['direccion'] ?? '');
+        if ($direccion !== '' && mb_strlen($direccion) < 5) {
+            $errores[] = 'La dirección debe tener al menos 5 caracteres si se ingresa.';
+        }
+
+        $antecedentes = trim($datos['antecedentes_medicos'] ?? '');
+
         if (!empty($errores)) {
-            http_response_code(422);
-            header('Content-Type: application/json');
-            echo json_encode(['ok' => false, 'errores' => $errores]);
-            exit;
+            return ['datos' => null, 'errores' => $errores];
         }
 
         return [
-            'nombres'               => trim($datos['nombres']),
-            'apellidos'             => trim($datos['apellidos']),
-            'documento_identidad'   => trim($datos['documento_identidad']),
-            'fecha_nacimiento'      => $datos['fecha_nacimiento'],
-            'genero'                => $datos['genero'],
-            'telefono'              => trim($datos['telefono']),
-            'email'                 => trim($datos['email']),
-            'direccion'             => trim($datos['direccion']),
-            'antecedentes_medicos'  => trim($datos['antecedentes_medicos']),
+            'datos' => [
+                'nombres'               => $nombres,
+                'apellidos'             => $apellidos,
+                'documento_identidad'   => $documento,
+                'fecha_nacimiento'      => $fecha,
+                'genero'                => $genero,
+                'telefono'              => $telefono,
+                'email'                 => $email,
+                'direccion'             => $direccion !== '' ? $direccion : null,
+                'antecedentes_medicos'  => $antecedentes !== '' ? $antecedentes : null,
+            ],
+            'errores' => [],
         ];
     }
 
