@@ -1,7 +1,13 @@
-#El proyecto UnionDental es un sistema de gestion de citas (Tipo esqueleto)
+# Sistema de Gestión - Clínica Dental
 
-Proyecto UnionDental
+## Requisitos Previos
+* Docker y Docker Desktop instalados y en ejecución.
+* Git.
 
-Acceder a los servicios:
-   - Aplicación: http://localhost:8080
-   - phpMyAdmin: http://localhost:8081 (usuario: `root`, contraseña: ``)
+## Puesta en Marcha Rápida (Entorno Local)
+
+1. Clonar el repositorio y situarse en la rama de trabajo:
+   ```bash
+   git clone <URL_DEL_REPOSITORIO>
+   cd proyecto-clinica
+   git checkout develop

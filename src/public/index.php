@@ -1,50 +1,173 @@
 <?php
 
+declare(strict_types=1);
 session_start();
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// Cargar configuración de base de datos
+require_once __DIR__ . '/../config/Database.php';
 
-define('BASE_PATH', dirname(__DIR__));
+// Manejo básico de URL (Front Controller)
+$url = $_GET['url'] ?? 'auth/login';
 
-spl_autoload_register(function ($class) {
-    $mapa = [
-        'App\\'    => 'app/',
-        'Config\\' => 'config/',
-    ];
+// Limpiar URL
+$url = filter_var(rtrim($url, '/'), FILTER_SANITIZE_URL);
 
-    foreach ($mapa as $prefijo => $carpeta) {
-        if (str_starts_with($class, $prefijo)) {
-            $resto = substr($class, strlen($prefijo));
-            $partes = explode('\\', $resto);
-            $partes[0] = strtolower($partes[0]);
+// Separar partes de la URL
+$urlParts = explode('/', $url);
 
-            $ruta = BASE_PATH . '/' . $carpeta . implode('/', $partes) . '.php';
-            if (file_exists($ruta)) {
-                require $ruta;
-            }
-            return;
+// Obtener controlador
+$controllerName = !empty($urlParts[0])
+    ? ucfirst($urlParts[0]) . 'Controller'
+    : 'HomeController';
+
+// Obtener acción
+$actionName = $urlParts[1] ?? 'index';
+
+// Obtener parámetros adicionales
+$params = array_map(
+    function ($param) {
+        return ctype_digit($param) ? (int) $param : $param;
+    },
+    array_slice($urlParts, 2)
+);
+
+// Ruta del archivo del controlador
+$controllerFile = __DIR__ . '/../controllers/' . $controllerName . '.php';
+
+if (file_exists($controllerFile)) {
+
+    require_once $controllerFile;
+
+    $controllerClass = "Controllers\\{$controllerName}";
+
+    if (class_exists($controllerClass)) {
+
+        $controller = new $controllerClass();
+
+        if (method_exists($controller, $actionName)) {
+
+            // Ejecutar acción y enviar parámetros de la URL
+            $controller->$actionName(...$params);
+
+            exit;
         }
     }
-});
+}
 
-use App\Core\Router;
-use App\Controllers\PacientesController;
+// Vista por defecto
+?>
+<!DOCTYPE html>
+<html lang="es">
 
-$rutamiento = new Router();
+<head>
+    <meta charset="UTF-8">
 
-$rutamiento->get('/pacientes',              [PacientesController::class, 'index']);
-$rutamiento->get('/pacientes/create',       [PacientesController::class, 'create']);
-$rutamiento->post('/pacientes/create',      [PacientesController::class, 'create']);
-$rutamiento->get('/pacientes/{id}',         [PacientesController::class, 'show']);
-$rutamiento->get('/pacientes/{id}/edit',    [PacientesController::class, 'edit']);
-$rutamiento->post('/pacientes/{id}/edit',   [PacientesController::class, 'edit']);
-$rutamiento->post('/pacientes/{id}/delete', [PacientesController::class, 'desactivar']);
-$rutamiento->get('/pacientes/{id}/delete', [PacientesController::class, 'eliminar']);
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-$rutamiento->get('/api/pacientes',          [PacientesController::class, 'search']);
+    <title>Clínica Dental - Core MVC</title>
 
-$rutamiento->despachar(
-    $_SERVER['REQUEST_METHOD'],
-    $_SERVER['REQUEST_URI']
-);
+    <style>
+        body {
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                sans-serif;
+
+            margin: 40px;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            max-width: 650px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #0f172a;
+            margin-top: 0;
+        }
+
+        .badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <span class="badge">
+        Sistema Base Operativo
+    </span>
+
+    <h1>
+        Clínica Dental - MVC Core
+    </h1>
+
+    <p>
+        Infraestructura levantada y base de datos lista
+        para integración de módulos.
+    </p>
+
+    <ul>
+
+        <li>
+            <strong>Ruta solicitada:</strong>
+
+            <code>
+                /<?= htmlspecialchars($url) ?>
+            </code>
+        </li>
+
+        <li>
+            <strong>Controlador esperado:</strong>
+
+            <code>
+                src/controllers/<?= htmlspecialchars($controllerName) ?>.php
+            </code>
+        </li>
+
+        <li>
+            <strong>Acción / Método:</strong>
+
+            <code>
+                <?= htmlspecialchars($actionName) ?>()
+            </code>
+        </li>
+
+    </ul>
+
+    <p>
+        <em>
+            Rama actual de trabajo:
+            <code>feature/servicios-catalogo</code>
+        </em>
+    </p>
+
+</div>
+
+</body>
+
+</html>
