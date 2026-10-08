@@ -172,6 +172,10 @@
             color: #374151;
         }
 
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
         .user-box {
             margin-top: 25px;
             padding: 14px;
@@ -218,6 +222,14 @@
                 class="active"
             >
                 Inicio
+            </a>
+
+            <a href="?url=medicos">
+                Médicos
+            </a>
+
+            <a href="?url=medicos/horarios">
+                Horarios
             </a>
 
             <a href="#">
@@ -327,8 +339,22 @@
             <div class="actions">
 
                 <a
-                    href="?url=servicio/index"
+                    href="?url=medicos"
                     class="btn btn-primary"
+                >
+                    Ver Médicos
+                </a>
+
+                <a
+                    href="?url=medicos/horarios"
+                    class="btn btn-secondary"
+                >
+                    Gestionar Horarios
+                </a>
+
+                <a
+                    href="?url=servicio/index"
+                    class="btn btn-secondary"
                 >
                     Ver servicios
                 </a>
@@ -338,13 +364,6 @@
                     class="btn btn-secondary"
                 >
                     Nuevo servicio
-                </a>
-
-                <a
-                    href="#"
-                    class="btn btn-secondary"
-                >
-                    Nueva cita
                 </a>
 
             </div>
