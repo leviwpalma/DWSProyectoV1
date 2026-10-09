@@ -236,7 +236,7 @@
                 Calendario
             </a>
 
-            <a href="#">
+            <a href="?url=pacientes/index">
                 Pacientes
             </a>
 

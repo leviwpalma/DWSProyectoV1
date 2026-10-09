@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Controllers;
+namespace Controllers;
+
+require_once __DIR__ . '/../models/Paciente.php';
 
 use Config\Database;
-use App\Models\Paciente;
+use Models\Paciente;
 
 class PacientesController
 {
@@ -43,7 +45,7 @@ class PacientesController
             }
 
             $this->model->crear($resultado['datos']);
-            header('Location: /pacientes');
+            header('Location: ?url=pacientes/index');
             exit;
         }
 

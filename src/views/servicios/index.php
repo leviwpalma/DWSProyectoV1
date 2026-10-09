@@ -74,6 +74,19 @@
             margin-top: auto;
         }
 
+        .logout a {
+            display: block;
+            text-decoration: none;
+            color: #4b5563;
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+
+        .logout a:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
         .main {
             flex: 1;
             padding: 36px;
@@ -188,34 +201,73 @@
 <div class="app">
 
     <aside class="sidebar">
+
         <div class="logo">
             <span>Union</span><span>Dental</span>
         </div>
 
         <nav class="menu">
-            <a href="?url=home/index">Inicio</a>
-            <a href="?url=servicio/index" class="active">Servicios</a>
-            <a href="#">Calendario</a>
-            <a href="#">Pacientes</a>
-            <a href="#">Configuración</a>
+
+            <a href="/?url=home/index">
+                Inicio
+            </a>
+
+            <a href="/?url=medicos/index">
+                Médicos
+            </a>
+
+            <a href="/?url=medicos/horarios">
+                Horarios
+            </a>
+
+            <a href="#">
+                Calendario
+            </a>
+
+            <a href="/?url=pacientes/index">
+                Pacientes
+            </a>
+
+            <a
+                href="/?url=servicio/index"
+                class="active"
+            >
+                Servicios
+            </a>
+
+            <a href="#">
+                Configuración
+            </a>
+
         </nav>
 
         <div class="logout">
-            <a href="#">Cerrar sesión</a>
+            <a href="/?url=auth/logout">
+                Cerrar sesión
+            </a>
         </div>
+
     </aside>
 
     <main class="main">
 
         <div class="header">
+
             <div>
                 <h1>Catálogo de Servicios</h1>
-                <p>Administra los procedimientos, duración y precios de referencia.</p>
+
+                <p>
+                    Administra los procedimientos, duración y precios de referencia.
+                </p>
             </div>
 
-            <a href="?url=servicio/crear" class="btn-primary">
+            <a
+                href="/?url=servicio/crear"
+                class="btn-primary"
+            >
                 + Nuevo servicio
             </a>
+
         </div>
 
         <div class="card">
@@ -229,6 +281,7 @@
             <?php else: ?>
 
                 <table>
+
                     <thead>
                         <tr>
                             <th>Servicio</th>
@@ -242,58 +295,68 @@
 
                     <tbody>
 
-                    <?php foreach ($servicios as $servicio): ?>
+                        <?php foreach ($servicios as $servicio): ?>
 
-                        <tr>
-                            <td>
-                                <?= htmlspecialchars($servicio['nombre']) ?>
-                            </td>
+                            <tr>
 
-                            <td>
-                                <?= htmlspecialchars($servicio['categoria']) ?>
-                            </td>
+                                <td>
+                                    <?= htmlspecialchars($servicio['nombre']) ?>
+                                </td>
 
-                            <td>
-                                <?= (int) $servicio['duracion_minutos'] ?> min
-                            </td>
+                                <td>
+                                    <?= htmlspecialchars($servicio['categoria']) ?>
+                                </td>
 
-                            <td>
-                                $<?= number_format((float) $servicio['precio_ref'], 2) ?>
-                            </td>
+                                <td>
+                                    <?= (int) $servicio['duracion_minutos'] ?> min
+                                </td>
 
-                            <td>
-                                <span class="estado <?= htmlspecialchars($servicio['estado']) ?>">
-                                    <?= ucfirst(htmlspecialchars($servicio['estado'])) ?>
-                                </span>
-                            </td>
+                                <td>
+                                    $<?= number_format(
+                                        (float) $servicio['precio_ref'],
+                                        2
+                                    ) ?>
+                                </td>
 
-                            <td class="acciones">
+                                <td>
+                                    <span
+                                        class="estado <?= htmlspecialchars($servicio['estado']) ?>"
+                                    >
+                                        <?= ucfirst(
+                                            htmlspecialchars($servicio['estado'])
+                                        ) ?>
+                                    </span>
+                                </td>
 
-                                <a
-                                    href="?url=servicio/editar/<?= (int) $servicio['id_servicio'] ?>"
-                                    class="editar"
-                                >
-                                    Editar
-                                </a>
-
-                                <?php if ($servicio['estado'] === 'activo'): ?>
+                                <td class="acciones">
 
                                     <a
-                                        href="?url=servicio/desactivar/<?= (int) $servicio['id_servicio'] ?>"
-                                        class="desactivar"
-                                        onclick="return confirm('¿Deseas desactivar este servicio?')"
+                                        href="/?url=servicio/editar/<?= (int) $servicio['id_servicio'] ?>"
+                                        class="editar"
                                     >
-                                        Desactivar
+                                        Editar
                                     </a>
 
-                                <?php endif; ?>
+                                    <?php if ($servicio['estado'] === 'activo'): ?>
 
-                            </td>
-                        </tr>
+                                        <a
+                                            href="/?url=servicio/desactivar/<?= (int) $servicio['id_servicio'] ?>"
+                                            class="desactivar"
+                                            onclick="return confirm('¿Deseas desactivar este servicio?')"
+                                        >
+                                            Desactivar
+                                        </a>
 
-                    <?php endforeach; ?>
+                                    <?php endif; ?>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
 
                     </tbody>
+
                 </table>
 
             <?php endif; ?>

@@ -3,77 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Médicos - UnionDental</title>
+
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4f7fb; color: #1f2937; }
-        .app { display: flex; min-height: 100vh; }
-        .sidebar { width: 230px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 30px 20px; display: flex; flex-direction: column; }
-        .logo { font-size: 24px; font-weight: 700; margin-bottom: 40px; }
-        .logo .union { color: #3b82f6; }
-        .logo .dental { color: #1f2937; }
-        .menu { display: flex; flex-direction: column; gap: 8px; }
-        .menu a { text-decoration: none; color: #4b5563; padding: 12px 14px; border-radius: 8px; font-size: 14px; }
-        .menu a:hover { background: #eff6ff; color: #2563eb; }
-        .menu a.active { background: #dbeafe; color: #2563eb; font-weight: 600; }
-        .logout { margin-top: auto; }
-        .logout a { display: block; text-decoration: none; color: #4b5563; padding: 12px 14px; border-radius: 8px; }
-        .logout a:hover { background: #fee2e2; color: #dc2626; }
-        .main { flex: 1; padding: 35px; }
-        .header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { margin: 0; font-size: 28px; }
-        .panel { background: #ffffff; padding: 26px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
-        .table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; }
-        .table th, .table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
-        .table th { background: #f9fafb; color: #4b5563; font-weight: 600; font-size: 14px; }
-        .badge { padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .btn { display: inline-block; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
-        .btn-primary { background: #2563eb; color: white; }
-        .user-box { margin-top: 25px; padding: 14px; background: #eff6ff; border-radius: 8px; font-size: 13px; }
-        .user-name { font-weight: 700; }
-        .user-role { color: #6b7280; margin-top: 4px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .logo .union {
+            color: #3b82f6;
+        }
+
+        .logo .dental {
+            color: #1f2937;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: #4b5563;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .menu a:hover {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .menu a.active {
+            background: #dbeafe;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .logout {
+            margin-top: auto;
+        }
+
+        .logout a {
+            display: block;
+            text-decoration: none;
+            color: #4b5563;
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+
+        .logout a:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .main {
+            flex: 1;
+            padding: 35px;
+        }
+
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #6b7280;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+
+        .panel {
+            background: #ffffff;
+            padding: 26px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background: #f9fafb;
+            color: #4b5563;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .table td {
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .user-box {
+            margin-top: 25px;
+            padding: 14px;
+            background: #eff6ff;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .user-name {
+            font-weight: 700;
+        }
+
+        .user-role {
+            color: #6b7280;
+            margin-top: 4px;
+        }
     </style>
 </head>
+
 <body>
+
 <div class="app">
+
     <aside class="sidebar">
-        <div class="logo"><span class="union">Union</span><span class="dental">Dental</span></div>
+
+        <div class="logo">
+            <span class="union">Union</span><span class="dental">Dental</span>
+        </div>
+
         <nav class="menu">
-            <a href="?url=home/index">Inicio</a>
-            <a href="?url=medicos" class="active">Médicos</a>
-            <a href="?url=medicos/horarios">Horarios</a>
-            <a href="#">Calendario</a>
-            <a href="#">Pacientes</a>
-            <a href="?url=servicio/index">Servicios</a>
-            <a href="#">Configuración</a>
+
+            <a href="/?url=home/index">
+                Inicio
+            </a>
+
+            <a href="/?url=medicos/index" class="active">
+                Médicos
+            </a>
+
+            <a href="/?url=medicos/horarios">
+                Horarios
+            </a>
+
+            <a href="#">
+                Calendario
+            </a>
+
+            <a href="/?url=pacientes/index">
+                Pacientes
+            </a>
+
+            <a href="/?url=servicio/index">
+                Servicios
+            </a>
+
+            <a href="#">
+                Configuración
+            </a>
+
         </nav>
 
         <?php if (!empty($_SESSION['usuario'])): ?>
+
             <div class="user-box">
+
                 <div class="user-name">
-                    <?= htmlspecialchars($_SESSION['usuario']['nombre'] . ' ' . $_SESSION['usuario']['apellido']) ?>
+                    <?= htmlspecialchars(
+                        $_SESSION['usuario']['nombre']
+                        . ' '
+                        . $_SESSION['usuario']['apellido']
+                    ) ?>
                 </div>
+
                 <div class="user-role">
                     <?= htmlspecialchars($_SESSION['usuario']['rol']) ?>
                 </div>
+
             </div>
+
         <?php endif; ?>
 
-        <div class="logout"><a href="?url=auth/logout">Cerrar sesión</a></div>
+        <div class="logout">
+            <a href="/?url=auth/logout">
+                Cerrar sesión
+            </a>
+        </div>
+
     </aside>
 
     <main class="main">
+
         <div class="header">
+
             <div>
                 <h1>Gestión de Médicos</h1>
-                <p style="color: #6b7280; margin-top: 5px;">Personal médico y especialidades de la clínica</p>
+
+                <p>
+                    Personal médico y especialidades de la clínica
+                </p>
             </div>
-            <a href="?url=medicos/horarios" class="btn btn-primary">Gestionar Horarios</a>
+
+            <a
+                href="/?url=medicos/horarios"
+                class="btn btn-primary"
+            >
+                Gestionar Horarios
+            </a>
+
         </div>
 
         <div class="panel">
+
             <table class="table">
+
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -82,25 +300,75 @@
                         <th>Estado</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
                     <?php if (!empty($medicos)): ?>
+
                         <?php foreach ($medicos as $m): ?>
+
                             <tr>
-                                <td><?= htmlspecialchars((string)$m['id_medico']) ?></td>
-                                <td><?= htmlspecialchars($m['especialidad']) ?></td>
-                                <td><?= htmlspecialchars($m['telefono']) ?></td>
-                                <td><span class="badge badge-success"><?= htmlspecialchars($m['estado']) ?></span></td>
+
+                                <td>
+                                    <?= htmlspecialchars((string) $m['id_medico']) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars($m['especialidad']) ?>
+                                </td>
+
+                                <td>
+                                    <?= htmlspecialchars($m['telefono'] ?? '—') ?>
+                                </td>
+
+                                <td>
+
+                                    <?php if (($m['estado'] ?? '') === 'activo'): ?>
+
+                                        <span class="badge badge-success">
+                                            Activo
+                                        </span>
+
+                                    <?php else: ?>
+
+                                        <span class="badge badge-danger">
+                                            Inactivo
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
                             </tr>
+
                         <?php endforeach; ?>
+
                     <?php else: ?>
+
                         <tr>
-                            <td colspan="4" style="text-align: center; color: #6b7280; padding: 20px;">No hay médicos registrados.</td>
+                            <td
+                                colspan="4"
+                                style="
+                                    text-align: center;
+                                    color: #6b7280;
+                                    padding: 20px;
+                                "
+                            >
+                                No hay médicos registrados.
+                            </td>
                         </tr>
+
                     <?php endif; ?>
+
                 </tbody>
+
             </table>
+
         </div>
+
     </main>
+
 </div>
+
 </body>
 </html>

@@ -124,7 +124,7 @@ INSERT IGNORE INTO roles (id_rol, nombre, descripcion) VALUES
 -- Usuario Administrador Inicial
 -- Password temporal: Admin1234! (Generado con password_hash de PHP BCRYPT)
 INSERT IGNORE INTO usuarios (id_usuario, id_rol, nombre, apellido, email, password_hash, estado) VALUES
-(1, 1, 'Admin', 'Sistema', 'admin@clinicadental.local', '$2y$10$wZk0N1WvGz6kYQ8Q1Jk9ne0sZzR6q4l6iGvN0fVlYl6OQy1x4fC7K', 'activo');
+(1, 1, 'Admin', 'Sistema', 'admin@clinicadental.local', '$2y$10$wcCVUCY6sF.FdT5hnEz5yuCM..5t1EVf6aDzejGhN7IDsP64Mi8KW', 'activo');
 
 -- Categorías iniciales de servicios
 INSERT IGNORE INTO categorias_servicio
