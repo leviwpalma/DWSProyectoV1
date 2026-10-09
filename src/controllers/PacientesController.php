@@ -6,17 +6,24 @@ require_once __DIR__ . '/../models/Paciente.php';
 
 use Config\Database;
 use Models\Paciente;
+use PDO;
 
 class PacientesController
 {
     private Paciente $model;
+    private PDO $db;
 
     public function __construct()
     {
-        $this->model = new Paciente(Database::getConnection());
+        if (empty($_SESSION['usuario'])) {
+            header('Location: ?url=auth/login');
+            exit;
+        }
+
+        $this->db = Database::getConnection();
+        $this->model = new Paciente($this->db);
     }
 
-    //
     public function index(): void
     {
         $q = trim($_GET['q'] ?? '');
@@ -31,7 +38,6 @@ class PacientesController
         require __DIR__ . '/../views/pacientes/index.php';
     }
 
-    //
     public function create(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,7 +60,6 @@ class PacientesController
         require __DIR__ . '/../views/pacientes/form.php';
     }
 
-    //
     public function edit(int $id): void
     {
         $paciente = $this->model->findById($id);
@@ -76,7 +81,7 @@ class PacientesController
             }
 
             $this->model->actualizar($id, $resultado['datos']);
-            header('Location: /pacientes');
+            header('Location: ?url=pacientes/index');
             exit;
         }
 
@@ -84,7 +89,6 @@ class PacientesController
         require __DIR__ . '/../views/pacientes/form.php';
     }
 
-    //
     public function eliminar(int $id): void
     {
         $paciente = $this->model->findById($id);
@@ -98,7 +102,6 @@ class PacientesController
         require __DIR__ . '/../views/pacientes/form.php';
     }
 
-    //
     public function show(int $id): void
     {
         $paciente = $this->model->findById($id);
@@ -108,7 +111,24 @@ class PacientesController
             exit('Paciente no existe');
         }
 
-        $historial = $this->model->historialCitas($id);
+        // Consultar historial enriquecido con diagnósticos médicos y citas
+        $sql = "SELECT c.id_cita, c.fecha_hora_inicio, c.estado,
+                       s.nombre AS servicio,
+                       CONCAT(u.nombre, ' ', u.apellido) AS medico,
+                       cm.id_consulta,
+                       cm.diagnostico,
+                       cm.tratamiento_realizado
+                FROM citas c
+                INNER JOIN servicios s ON s.id_servicio = c.id_servicio
+                INNER JOIN medicos m ON m.id_medico = c.id_medico
+                INNER JOIN usuarios u ON u.id_usuario = m.id_usuario
+                LEFT JOIN consultas_medicas cm ON cm.id_cita = c.id_cita
+                WHERE c.id_paciente = :id
+                ORDER BY c.fecha_hora_inicio DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         require __DIR__ . '/../views/pacientes/show.php';
     }
@@ -116,7 +136,7 @@ class PacientesController
     public function desactivar(int $id): void
     {
         $this->model->inactivar($id);
-        header('Location: /pacientes');
+        header('Location: ?url=pacientes/index');
         exit;
     }
 
@@ -202,21 +222,20 @@ class PacientesController
 
         return [
             'datos' => [
-                'nombres'               => $nombres,
-                'apellidos'             => $apellidos,
-                'documento_identidad'   => $documento,
+                'nombres'              => $nombres,
+                'apellidos'            => $apellidos,
+                'documento_identidad'  => $documento,
                 'fecha_nacimiento'      => $fecha,
-                'genero'                => $genero,
-                'telefono'              => $telefono,
-                'email'                 => $email,
-                'direccion'             => $direccion !== '' ? $direccion : null,
-                'antecedentes_medicos'  => $antecedentes !== '' ? $antecedentes : null,
+                'genero'               => $genero,
+                'telefono'             => $telefono,
+                'email'                => $email,
+                'direccion'            => $direccion !== '' ? $direccion : null,
+                'antecedentes_medicos' => $antecedentes !== '' ? $antecedentes : null,
             ],
             'errores' => [],
         ];
     }
 
-    //
     private function esAjax(): bool
     {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === "xmlhttprequest";

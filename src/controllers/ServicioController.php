@@ -15,6 +15,11 @@ class ServicioController
 
     public function __construct()
     {
+        if (empty($_SESSION['usuario'])) {
+            header('Location: ?url=auth/login');
+            exit;
+        }
+
         $this->servicioModel = new Servicio();
         $this->categoriaModel = new CategoriaServicio();
     }

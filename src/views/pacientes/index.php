@@ -1,422 +1,125 @@
-<?php
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes - UnionDental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f4f7fb; color: #1f2937; }
+        .app { display: flex; min-height: 100vh; }
+        .sidebar { width: 230px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { font-size: 24px; font-weight: 700; margin-bottom: 40px; }
+        .logo .union { color: #3b82f6; }
+        .logo .dental { color: #1f2937; }
+        .menu { display: flex; flex-direction: column; gap: 8px; }
+        .menu a { text-decoration: none; color: #4b5563; padding: 12px 14px; border-radius: 8px; font-size: 14px; }
+        .menu a:hover { background: #eff6ff; color: #2563eb; }
+        .menu a.active { background: #dbeafe; color: #2563eb; font-weight: 600; }
+        .main { flex: 1; padding: 35px; }
+        .header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header p { color: #6b7280; margin-top: 5px; margin-bottom: 0; }
+        .btn-primary { background: #2563eb; color: white; text-decoration: none; padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block; border: none; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .card-busqueda { background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 24px; }
+        .card-busqueda label { font-size: 15px; font-weight: 600; color: #374151; display: block; margin-bottom: 12px; }
+        .input-busqueda { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; background: #f9fafb; }
+        .input-busqueda:focus { border-color: #3b82f6; background: #ffffff; }
+        .panel-tabla { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f9fafb; color: #4b5563; font-weight: 600; font-size: 14px; padding: 14px 16px; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover td { background: #fbfcfe; }
+        .acciones a { text-decoration: none; margin-left: 8px; font-size: 16px; }
+        .acciones .ver { color: #0284c7; }
+        .acciones .editar { color: #d97706; }
+        .acciones .eliminar { color: #dc2626; }
+        .user-box { margin-top: auto; padding: 14px; background: #eff6ff; border-radius: 8px; font-size: 13px; margin-bottom: 15px; }
+        .user-name { font-weight: 700; color: #1f2937; }
+        .user-role { color: #6b7280; margin-top: 4px; }
+        .logout a { display: block; text-decoration: none; color: #dc2626; padding: 12px 14px; border-radius: 8px; font-size: 14px; }
+        .logout a:hover { background: #fee2e2; }
+    </style>
+</head>
+<body>
+<div class="app">
+   
+    <?php require __DIR__ . '/../layouts/sidebar.php'; ?>
 
-$title = 'Pacientes | UnionDental';
-
-require __DIR__ . '/../layout.php';
-
-?>
-
-<div class="page-wrapper">
-
-    <div class="breadcrumb-custom">
-        <span>Pacientes</span>
-        &nbsp;›&nbsp;
-        Buscar pacientes
-    </div>
-
-    <h2 class="mb-4" style="font-weight: 600;">
-        Lista de pacientes
-    </h2>
-
-    <div class="card-soft p-4 mb-4">
-
-        <div class="d-flex justify-content-between align-items-start mb-3">
-
-            <label class="label-soft-lg mb-0">
-                Busca pacientes por nombre, teléfono o documento
-            </label>
-
-            <a
-                href="/?url=pacientes/create"
-                class="btn btn-primary btn-sm"
-            >
-                Nuevo paciente +
-            </a>
-
+    <main class="main">
+        <div class="header">
+            <div>
+                <h1>Lista de Pacientes</h1>
+                <p>Gestión de expedientes y datos personales</p>
+            </div>
+            <a href="?url=pacientes/create" class="btn-primary">+ Nuevo paciente</a>
         </div>
 
-        <div class="position-relative">
-
-            <i
-                class="bi bi-search position-absolute"
-                style="
-                    left: 16px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #94a3b8;
-                "
-            ></i>
-
+        <div class="card-busqueda">
+            <label for="search">Busca pacientes por nombre, teléfono o documento</label>
             <input
                 type="text"
                 id="search"
-                class="form-control input-soft ps-5"
-                placeholder="Ingresa nombre, teléfono o N° de expediente"
+                class="input-busqueda"
+                placeholder="Ingresa nombre, teléfono o N° de expediente..."
                 value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
             >
-
         </div>
 
-    </div>
-
-
-    <div class="card-soft">
-
-        <div class="table-responsive">
-
-            <table class="table table-clean mb-0">
-
+        <div class="panel-tabla">
+            <table>
                 <thead>
                     <tr>
                         <th>Nombres</th>
                         <th>Apellidos</th>
                         <th>N° Expediente</th>
                         <th>Documento</th>
-                        <th>Fecha de nacimiento</th>
+                        <th>Fecha de Nacimiento</th>
                         <th>Teléfono</th>
                         <th>Correo</th>
-                        <th class="text-end">Acciones</th>
+                        <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody id="pacientes-table">
-
                     <?php if (empty($pacientes)): ?>
-
                         <tr>
-
-                            <td
-                                colspan="8"
-                                class="text-center text-muted py-5"
-                            >
-
-                                <i
-                                    class="bi bi-inbox d-block mb-2"
-                                    style="font-size: 1.5rem;"
-                                ></i>
-
+                            <td colspan="8" style="text-align: center; color: #6b7280; padding: 30px;">
                                 No se encuentran pacientes registrados.
-
                             </td>
-
                         </tr>
-
                     <?php else: ?>
-
                         <?php foreach ($pacientes as $p): ?>
-
                             <tr>
-
+                                <td><?= htmlspecialchars($p['nombres']) ?></td>
+                                <td><?= htmlspecialchars($p['apellidos']) ?></td>
+                                <td><strong><?= htmlspecialchars($p['codigo_expediente']) ?></strong></td>
+                                <td><?= htmlspecialchars($p['documento_identidad'] ?? '—') ?></td>
                                 <td>
-                                    <?= htmlspecialchars($p['nombres']) ?>
+                                    <?php
+                                    if (!empty($p['fecha_nacimiento'])) {
+                                        echo htmlspecialchars(date('d/m/Y', strtotime($p['fecha_nacimiento'])));
+                                    } else {
+                                        echo '—';
+                                    }
+                                    ?>
                                 </td>
-
-                                <td>
-                                    <?= htmlspecialchars($p['apellidos']) ?>
+                                <td><?= htmlspecialchars($p['telefono']) ?></td>
+                                <td><?= htmlspecialchars($p['email'] ?? '—') ?></td>
+                                <td class="acciones" style="text-align: right;">
+                                    <a href="?url=pacientes/show/<?= (int) $p['id_paciente'] ?>" class="ver" title="Ver Expediente"><i class="bi bi-eye"></i></a>
+                                    <a href="?url=pacientes/edit/<?= (int) $p['id_paciente'] ?>" class="editar" title="Editar"><i class="bi bi-pencil"></i></a>
+                                    <a href="?url=pacientes/eliminar/<?= (int) $p['id_paciente'] ?>" class="eliminar" title="Eliminar"><i class="bi bi-trash"></i></a>
                                 </td>
-
-                                <td>
-                                    <?= htmlspecialchars($p['codigo_expediente']) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars(
-                                        $p['documento_identidad'] ?? '—'
-                                    ) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars(
-                                        $p['fecha_nacimiento'] ?? '—'
-                                    ) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars($p['telefono']) ?>
-                                </td>
-
-                                <td>
-                                    <?= htmlspecialchars(
-                                        $p['email'] ?? '—'
-                                    ) ?>
-                                </td>
-
-                                <td class="text-end">
-
-                                    <!-- Ver expediente -->
-                                    <a
-                                        href="#"
-                                        class="text-info me-2"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#expediente-<?= (int) $p['id_paciente'] ?>"
-                                        title="Ver expediente"
-                                    >
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-
-                                    <!-- Editar -->
-                                    <a
-                                        href="/?url=pacientes/edit/<?= (int) $p['id_paciente'] ?>"
-                                        class="text-warning me-2"
-                                        title="Editar"
-                                    >
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-
-                                    <!-- Eliminar -->
-                                    <a
-                                        href="/?url=pacientes/eliminar/<?= (int) $p['id_paciente'] ?>"
-                                        class="text-danger"
-                                        title="Eliminar"
-                                    >
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-
-                                </td>
-
                             </tr>
-
-
-                            <!-- Modal expediente -->
-
-                            <div
-                                class="modal fade expediente-modal"
-                                id="expediente-<?= (int) $p['id_paciente'] ?>"
-                                tabindex="-1"
-                            >
-
-                                <div class="modal-dialog modal-dialog-centered modal-lg">
-
-                                    <div class="modal-content">
-
-                                        <div class="modal-body">
-
-                                            <div class="expediente-card">
-
-                                                <div class="expediente-side">
-
-                                                    <div>
-
-                                                        <div class="exp-label">
-
-                                                            Expediente No.<br>
-
-                                                            <?= htmlspecialchars(
-                                                                $p['codigo_expediente']
-                                                            ) ?>
-
-                                                        </div>
-
-                                                        <div class="exp-avatar">
-
-                                                            <i class="bi bi-person"></i>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="exp-dots">
-                                                        • • •
-                                                    </div>
-
-                                                </div>
-
-
-                                                <div class="expediente-main">
-
-                                                    <h4>
-                                                        <?= htmlspecialchars(
-                                                            $p['nombres']
-                                                            . ' '
-                                                            . $p['apellidos']
-                                                        ) ?>
-                                                    </h4>
-
-                                                    <div class="expediente-grid">
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-gender-ambiguous"></i>
-
-                                                            <span>
-                                                                <?php
-
-                                                                $generos = [
-                                                                    'M' => 'Masculino',
-                                                                    'F' => 'Femenino',
-                                                                    'Otro' => 'Otro'
-                                                                ];
-
-                                                                echo htmlspecialchars(
-                                                                    $generos[
-                                                                        $p['genero'] ?? ''
-                                                                    ] ?? 'n/d'
-                                                                );
-
-                                                                ?>
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-geo-alt"></i>
-
-                                                            <span>
-                                                                <?= htmlspecialchars(
-                                                                    $p['direccion']
-                                                                    ?? 'Sin dirección'
-                                                                ) ?>
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-calendar"></i>
-
-                                                            <span>
-
-                                                                <?php
-
-                                                                if (
-                                                                    !empty(
-                                                                        $p['fecha_nacimiento']
-                                                                    )
-                                                                ) {
-
-                                                                    $meses = [
-                                                                        'ene',
-                                                                        'feb',
-                                                                        'mar',
-                                                                        'abr',
-                                                                        'may',
-                                                                        'jun',
-                                                                        'jul',
-                                                                        'ago',
-                                                                        'sep',
-                                                                        'oct',
-                                                                        'nov',
-                                                                        'dic'
-                                                                    ];
-
-                                                                    [
-                                                                        $y,
-                                                                        $m,
-                                                                        $d
-                                                                    ] = explode(
-                                                                        '-',
-                                                                        $p['fecha_nacimiento']
-                                                                    );
-
-                                                                    echo htmlspecialchars(
-                                                                        $d
-                                                                        . '-'
-                                                                        . $meses[
-                                                                            (int) $m - 1
-                                                                        ]
-                                                                        . '-'
-                                                                        . $y
-                                                                    );
-
-                                                                } else {
-
-                                                                    echo 'n/d';
-
-                                                                }
-
-                                                                ?>
-
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-telephone"></i>
-
-                                                            <span>
-                                                                <?= htmlspecialchars(
-                                                                    $p['telefono']
-                                                                ) ?>
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-card-text"></i>
-
-                                                            <span>
-                                                                <?= htmlspecialchars(
-                                                                    $p['documento_identidad']
-                                                                    ?? 'n/d'
-                                                                ) ?>
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div class="expediente-item">
-
-                                                            <i class="bi bi-envelope"></i>
-
-                                                            <span>
-                                                                <?= htmlspecialchars(
-                                                                    $p['email']
-                                                                    ?? 'n/d'
-                                                                ) ?>
-                                                            </span>
-
-                                                        </div>
-
-
-                                                        <div
-                                                            class="expediente-item"
-                                                            style="grid-column: 1 / -1;"
-                                                        >
-
-                                                            <i class="bi bi-clipboard-pulse"></i>
-
-                                                            <span>
-                                                                <?= htmlspecialchars(
-                                                                    $p['antecedentes_medicos']
-                                                                    ?? 'Sin antecedentes registrados'
-                                                                ) ?>
-                                                            </span>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
                         <?php endforeach; ?>
-
                     <?php endif; ?>
-
                 </tbody>
-
             </table>
-
         </div>
-
-    </div>
-
+    </main>
 </div>
-
-<?php require __DIR__ . '/../layout-footer.php'; ?>
+<script src="js/pacientes.js?v=3"></script>
+</body>
+</html>

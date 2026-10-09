@@ -1,23 +1,27 @@
 <?php
+
 namespace Models;
 
 use PDO;
 
-class HorarioAtencion {
-    private $db;
+class HorarioAtencion 
+{
+    private PDO $db;
 
-    public function __construct(PDO $db) {
+    public function __construct(PDO $db) 
+    {
         $this->db = $db;
     }
 
     /**
-     * Obtener todas las franjas/bloques de atención configurados para un médico específico
+     * Obtener todas las franjas de atención configuradas para un médico
      */
-    public function obtenerPorMedico(int $idMedico): array {
-        $sql = "SELECT id, id_medico, dia_semana, hora_apertura, hora_cierre 
+    public function obtenerPorMedico(int $idMedico): array 
+    {
+        $sql = "SELECT id_horario, id_medico, dia_semana, hora_inicio, hora_fin 
                 FROM horarios_atencion 
                 WHERE id_medico = :id_medico 
-                ORDER BY FIELD(dia_semana, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'), hora_apertura ASC";
+                ORDER BY FIELD(dia_semana, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'), hora_inicio ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id_medico' => $idMedico]);
@@ -27,27 +31,29 @@ class HorarioAtencion {
     /**
      * Guardar o asignar una nueva franja horaria a un médico
      */
-    public function crear(int $idMedico, string $diaSemana, string $horaApertura, string $horaCierre): bool {
-        $sql = "INSERT INTO horarios_atencion (id_medico, dia_semana, hora_apertura, hora_cierre) 
-                VALUES (:id_medico, :dia_semana, :hora_apertura, :hora_cierre)";
+    public function crear(int $idMedico, string $diaSemana, string $horaInicio, string $horaFin): bool 
+    {
+        $sql = "INSERT INTO horarios_atencion (id_medico, dia_semana, hora_inicio, hora_fin) 
+                VALUES (:id_medico, :dia_semana, :hora_inicio, :hora_fin)";
 
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
-            ':id_medico'     => $idMedico,
-            ':dia_semana'    => $diaSemana,
-            ':hora_apertura' => $horaApertura,
-            ':hora_cierre'   => $horaCierre
+            ':id_medico'    => $idMedico,
+            ':dia_semana'   => $diaSemana,
+            ':hora_inicio'  => $horaInicio,
+            ':hora_fin'     => $horaFin
         ]);
     }
 
     /**
      * Regla de Negocio RN-02: Comprueba si un médico atiende en una fecha y hora determinadas
      */
-    public function validarRN02RangoAtencion(int $idMedico, string $diaSemana, string $horaConsulta): bool {
+    public function validarRN02RangoAtencion(int $idMedico, string $diaSemana, string $horaConsulta): bool 
+    {
         $sql = "SELECT COUNT(*) FROM horarios_atencion 
                 WHERE id_medico = :id_medico 
-                AND LOWER(dia_semana) = LOWER(:dia_semana) 
-                AND :hora_consulta BETWEEN hora_apertura AND hora_cierre";
+                  AND dia_semana = :dia_semana 
+                  AND :hora_consulta BETWEEN hora_inicio AND hora_fin";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
@@ -60,26 +66,27 @@ class HorarioAtencion {
     }
 
     /**
-     * Obtener bloques de atención de un médico en un día específico (Usado para Fetch API)
+     * Obtener bloques de atención de un médico en un día específico (Usado para la API JSON)
      */
     public function obtenerBloquesPorDia(int $idMedico, string $diaSemana): array
-{
-    $sql = "SELECT 
-                id_horario,
-                id_medico,
-                dia_semana,
-                hora_inicio AS hora_apertura,
-                hora_fin AS hora_cierre
-            FROM horarios_atencion
-            WHERE id_medico = :id_medico 
-              AND dia_semana = :dia_semana";
+    {
+        $sql = "SELECT 
+                    id_horario,
+                    id_medico,
+                    dia_semana,
+                    hora_inicio,
+                    hora_fin
+                FROM horarios_atencion
+                WHERE id_medico = :id_medico 
+                  AND dia_semana = :dia_semana
+                ORDER BY hora_inicio ASC";
 
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute([
-        ':id_medico' => $idMedico,
-        ':dia_semana' => $diaSemana
-    ]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':id_medico'  => $idMedico,
+            ':dia_semana' => $diaSemana
+        ]);
 
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-}
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
