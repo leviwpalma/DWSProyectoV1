@@ -31,7 +31,7 @@ services:
       MYSQL_PASSWORD: Clinica2026!Pass
       MYSQL_ROOT_PASSWORD: Root2026!Pass
     ports:
-      - "3308:3306"                # Puerto 3308 en tu máquina para no chocar con el 3306 ni 3307
+      - "3308:3306"                # Puerto 3308 para no chocar con el 3306 ni 3307
     volumes:
       - clinica_db_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro

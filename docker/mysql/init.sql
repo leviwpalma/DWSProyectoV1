@@ -5,7 +5,7 @@ USE clinica_dental_db;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 1. Tabla de Roles (RBAC)
+-- 1. Tabla de Roles (RBAC)+
 CREATE TABLE IF NOT EXISTS roles (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
